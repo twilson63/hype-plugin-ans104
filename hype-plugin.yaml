@@ -1,0 +1,7 @@
+name: "ans104"
+version: "1.0.0"
+type: "lua"
+main: "plugin.lua"
+description: "ANS-104 data item signing plugin for Hype"
+author: "ANS-104 Plugin Team"
+license: "MIT"
