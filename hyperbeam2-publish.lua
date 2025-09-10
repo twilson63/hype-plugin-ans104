@@ -2,9 +2,6 @@
 local ans104 = require("ans104")
 local http = require("http")
 
-local hburl = "http://localhost:8734"
-local hbkey = "v6sA1RIw1qE7lftYxIujD6v4XZdL2DrG8r40uDtCqyA"
-
 -- Create and sign a data item
 local dataItem, err = ans104.create({
     wallet = "./wallet.json",
@@ -12,21 +9,18 @@ local dataItem, err = ans104.create({
     anchor = "",
     data = "",
     tags = {
-        {name = "app-name", value = "hype-aos"},
-        {name = "created", value = tostring(os.time())},
-        {name = "data-protocol", value = "ao"},
-        {name = "device", value = "process@1.0"},
-        -- {name = "execution-device", value = "lua@5.3a"},
-        {name = "execution-device", value = "stack@1.0"},
-        {name = "device-stack", value = "dedup@1.0"},
-        {name = "device-stack", value = "lua@5.3a"},
-        {name = "module", value = "xVcnPK8MPmcocS6zwq1eLmM2KhfyarP8zzmz3UVi1g4"},
-        {name = "push-device", value = "push@1.0"},
-        {name = "scheduler", value = hbkey},
-        {name = "authority", value = hbkey},
-        {name = "scheduler-device", value = "scheduler@1.0"},
-        {name = "type", value = "Process"},
-        {name = "Variant", value = "ao.N.1"}
+        ["app-name"] = "hype-aos",
+        ["created"] = tostring(os.time()),
+        ["data-protocol"] = "ao",
+        device = "process@1.0",
+        ["execution-device"] = "lua@5.3a",
+        ["module"] = "xVcnPK8MPmcocS6zwq1eLmM2KhfyarP8zzmz3UVi1g4",
+        ["push-device"] = "push@1.0",
+        ["scheduler"] = "v6sA1RIw1qE7lftYxIujD6v4XZdL2DrG8r40uDtCqyA",
+        ["authority"] = "v6sA1RIw1qE7lftYxIujD6v4XZdL2DrG8r40uDtCqyA",
+        ["scheduler-device"] = "scheduler@1.0",
+        type = "Process",
+        variant = "ao.N.1"
     }
 })
 
@@ -74,7 +68,7 @@ print("")
 print("📤 To publish to Arweave, use one of these commands:")
 print("")
 
-local response = http.post(hburl .. "/push", rawData, {
+local response = http.post("http://localhost:8734/push", rawData, {
   headers = {
     ["content-type"] = "application/ans104",
     ["codec-device"] = "ans104@1.0",

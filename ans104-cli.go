@@ -16,7 +16,7 @@ type Params struct {
 	Data   string            `json:"data"`
 	Target string            `json:"target,omitempty"`
 	Anchor string            `json:"anchor,omitempty"`
-	Tags   map[string]string `json:"tags,omitempty"`
+	Tags   interface{}       `json:"tags,omitempty"` // Can be map[string]string or []map[string]string
 }
 
 type Result struct {
@@ -65,13 +65,35 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Process tags
+	// Process tags - support both map format and array format
 	var tags []types.Tag
-	for name, value := range params.Tags {
-		tags = append(tags, types.Tag{
-			Name:  name,
-			Value: value,
-		})
+	if params.Tags != nil {
+		switch t := params.Tags.(type) {
+		case map[string]interface{}:
+			// Original format: {"tag-name": "value"}
+			for name, value := range t {
+				if strValue, ok := value.(string); ok {
+					tags = append(tags, types.Tag{
+						Name:  name,
+						Value: strValue,
+					})
+				}
+			}
+		case []interface{}:
+			// Array format: [{"name": "tag-name", "value": "value"}]
+			for _, item := range t {
+				if tagMap, ok := item.(map[string]interface{}); ok {
+					if name, nameOk := tagMap["name"].(string); nameOk {
+						if value, valueOk := tagMap["value"].(string); valueOk {
+							tags = append(tags, types.Tag{
+								Name:  name,
+								Value: value,
+							})
+						}
+					}
+				}
+			}
+		}
 	}
 
 	// Create and sign data item

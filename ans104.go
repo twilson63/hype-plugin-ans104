@@ -39,15 +39,33 @@ func (p *Plugin) CreateDataItem(params map[string]interface{}) (map[string]inter
 		return nil, fmt.Errorf("failed to create item signer: %w", err)
 	}
 	
-	// Process tags
+	// Process tags - support both map format and array format
 	var tags []types.Tag
-	if tagsParam, ok := params["tags"].(map[string]interface{}); ok {
-		for name, value := range tagsParam {
-			if strValue, ok := value.(string); ok {
-				tags = append(tags, types.Tag{
-					Name:  name,
-					Value: strValue,
-				})
+	if tagsParam, ok := params["tags"]; ok {
+		switch t := tagsParam.(type) {
+		case map[string]interface{}:
+			// Original format: {"tag-name": "value"}
+			for name, value := range t {
+				if strValue, ok := value.(string); ok {
+					tags = append(tags, types.Tag{
+						Name:  name,
+						Value: strValue,
+					})
+				}
+			}
+		case []interface{}:
+			// Array format: [{"name": "tag-name", "value": "value"}]
+			for _, item := range t {
+				if tagMap, ok := item.(map[string]interface{}); ok {
+					name, nameOk := tagMap["name"].(string)
+					value, valueOk := tagMap["value"].(string)
+					if nameOk && valueOk {
+						tags = append(tags, types.Tag{
+							Name:  name,
+							Value: value,
+						})
+					}
+				}
 			}
 		}
 	}
@@ -129,15 +147,33 @@ func (p *Plugin) GetBundle(params map[string]interface{}) (map[string]interface{
 		return nil, fmt.Errorf("failed to create item signer: %w", err)
 	}
 	
-	// Process tags
+	// Process tags - support both map format and array format
 	var tags []types.Tag
-	if tagsParam, ok := params["tags"].(map[string]interface{}); ok {
-		for name, value := range tagsParam {
-			if strValue, ok := value.(string); ok {
-				tags = append(tags, types.Tag{
-					Name:  name,
-					Value: strValue,
-				})
+	if tagsParam, ok := params["tags"]; ok {
+		switch t := tagsParam.(type) {
+		case map[string]interface{}:
+			// Original format: {"tag-name": "value"}
+			for name, value := range t {
+				if strValue, ok := value.(string); ok {
+					tags = append(tags, types.Tag{
+						Name:  name,
+						Value: strValue,
+					})
+				}
+			}
+		case []interface{}:
+			// Array format: [{"name": "tag-name", "value": "value"}]
+			for _, item := range t {
+				if tagMap, ok := item.(map[string]interface{}); ok {
+					name, nameOk := tagMap["name"].(string)
+					value, valueOk := tagMap["value"].(string)
+					if nameOk && valueOk {
+						tags = append(tags, types.Tag{
+							Name:  name,
+							Value: value,
+						})
+					}
+				}
 			}
 		}
 	}
